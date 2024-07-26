@@ -4,19 +4,22 @@ package org.vladimir.infotecs.keyvaluedb.controller;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.vladimir.infotecs.keyvaluedb.dto.DeleteValueByKeyResponse;
 import org.vladimir.infotecs.keyvaluedb.dto.GetValueByKeyResponse;
 import org.vladimir.infotecs.keyvaluedb.dto.LoadDumpRequest;
 import org.vladimir.infotecs.keyvaluedb.dto.SetValueByKeyRequest;
 import org.vladimir.infotecs.keyvaluedb.exception.KeyNotFound;
+import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 import org.vladimir.infotecs.keyvaluedb.service.KeyValueDbService;
 
 import java.util.Map;
 
 @RestController
 
-public class KeyValueDbControllerImpl implements KeyValueDbController{
+public class KeyValueDbControllerImpl implements KeyValueDbController {
 
     private final KeyValueDbService keyValueDbService;
 
@@ -39,7 +42,7 @@ public class KeyValueDbControllerImpl implements KeyValueDbController{
     }
 
 
-    public ResponseEntity<DeleteValueByKeyResponse> deleteValueByKey(@PathVariable  String key) {
+    public ResponseEntity<DeleteValueByKeyResponse> deleteValueByKey(@PathVariable String key) {
         DeleteValueByKeyResponse response = new DeleteValueByKeyResponse();
         response.setValue(
                 keyValueDbService
@@ -48,15 +51,13 @@ public class KeyValueDbControllerImpl implements KeyValueDbController{
         return ResponseEntity.ok(response);
     }
 
-
-    public ResponseEntity<Map<String, String>> getDump() {
-        Map<String, String> dump = keyValueDbService.getAllValues();
-        return ResponseEntity.ok(dump);
+    public ResponseEntity<Map<String, ValueWithExpirationTime>> getDump() {
+        return ResponseEntity.ok(keyValueDbService.getDump());
     }
 
 
-    public ResponseEntity<Void> loadDump(@Valid @RequestBody LoadDumpRequest requestBody) {
-        keyValueDbService.loadAllValuesByKey(requestBody.getDump());
+    public ResponseEntity<Void> restoreFromDump(@Valid @RequestBody LoadDumpRequest requestBody) {
+        keyValueDbService.restoreFromDump(requestBody.getDump());
         return ResponseEntity.ok().build();
     }
 

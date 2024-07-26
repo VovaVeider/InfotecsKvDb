@@ -2,73 +2,101 @@ package org.vladimir.infotecs.keyvaluedb.repository;
 
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * An interface for a key-value repository that supports basic CRUD operations and expiration management.
- * Key value pairs that have expired will be deleted
- * <p>
- * </p>
+ * An interface for a key-value repository.Key and not value are not null
+ * Outdated key-value pairs auto removing isn't guaranteed, see implementation details
+ * Expiration time is presented in unix time(long) (seconds since epoch in UTC)
+ *
  */
 public interface KeyValueRepository {
 
-    /**
-     * Retrieves the value associated with the specified key.
-     *
-     * @param key the key whose associated value is to be returned
-     * @return an {@link Optional} containing the {@link ValueWithExpirationTime} associated with the key, or an empty {@link Optional} if the key does not exist
-     */
     Optional<ValueWithExpirationTime> get(String key);
 
     /**
-     * Associates the specified value with the specified key and sets an expiration time.
-     *
-     * @param key            the key with which the specified value is to be associated
-     * @param value          the value to be associated with the key
-     * @param expirationTime the time at which the value should expire
+     * Get value if current time(see implementation details) isn't greater than expiration time
      */
-    void put(String key, String value, LocalDateTime expirationTime);
+    Optional<ValueWithExpirationTime> getIfNotOutdated(String key);
 
     /**
-     * Removes the value associated with the specified key.
+     * Get value if provided time  isn't greater than expiration time
      *
-     * @param key the key whose associated value is to be removed
-     * @return an {@link Optional} containing the removed {@link ValueWithExpirationTime}, or an empty {@link Optional} if the key did not exist
+     * @param key  Key of a pair
+     * @param time current time in unix time (seconds since epoch in UTC)
      */
-    Optional<ValueWithExpirationTime> remove(String key);
+    Optional<ValueWithExpirationTime> getIfNotOutdated(String key, long time);
 
     /**
-     * Returns a copy of all key-value mappings in the repository.
+     * Put value by key
      *
-     * @return a {@link Map} containing all key-value pairs in the repository, where the keys are the keys and the values are the {@link ValueWithExpirationTime} objects
+     * @param key            Key of a pair
+     * @param expirationTime in unix time (seconds since epoch in UTC)
+     */
+    void put(String key, String value, long expirationTime);
+
+
+    /**
+     * Remove a value by key
+     *
+     * @param key Key of a pair
+     * @return true if key-value pair exists, otherwise false
+     */
+    boolean remove(String key);
+
+    Optional<ValueWithExpirationTime> removeAndReturn(String key);
+
+    /**
+     * Remove the value by key. Returns an empty Optional if the value is not present or if it is outdated
+     * (i.e., if the current time is greater than the expiration time; see implementation details)
+     *
+     * @param key Key of a pair
+     */
+    Optional<ValueWithExpirationTime> removeAndReturnIfNotOutdated(String key);
+
+    /**
+     * Remove the value by key. Returns an empty Optional if the value is not present or if it is outdated
+     * (i.e., if the current time is greater than the provided time)
+     *
+     * @param key  Key of a pair
+     * @param time current time in unix time (seconds since epoch in UTC)
+     */
+    Optional<ValueWithExpirationTime> removeAndReturnIfNotOutdated(String key, long time);
+
+    /**
+     * Get current state of the storage
+     *
+     * @return Map that represents current state of the storage
      */
     Map<String, ValueWithExpirationTime> getAll();
 
     /**
-     * Sets the key-value mappings from the specified map into this repository.
-     *
-     * @param map a {@link Map} containing key-value pairs to be added or updated in the repository
+     * Add all key-value pairs to the storage.
+     * The values for keys that are not represented in the map will remain unchanged.
      */
-    void setAll(Map<String, ValueWithExpirationTime> map);
+    void addAll(Map<String, ValueWithExpirationTime> map);
 
     /**
-     * Removes all key-value pairs from the repository where the expiration time has passed.
+     * Remove  outdated key-value pairs
+     * (i.e., if the current time is greater than the expiration time; see implementation details)
      */
     void removeAllOutdatedPairs();
 
     /**
-     * Clears all key-value mappings from the repository.
+     * Remove  outdated key-value pairs
+     * (i.e., if the presented time is greater than the expiration time; see implementation details)
+     *
+     * @param time current time in unix time (seconds since epoch in UTC)
+     */
+    void removeAllOutdatedPairs(long time);
+
+    /**
+     * Clear repository
      */
     void clear();
 
-    /**
-     * Checks if a value is associated with the specified key.
-     *
-     * @param key the key whose presence in the repository is to be tested
-     * @return {@code true} if a value is associated with the key; {@code false} otherwise
-     */
     boolean contains(String key);
+
 }
 

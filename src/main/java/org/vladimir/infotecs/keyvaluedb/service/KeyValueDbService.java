@@ -1,5 +1,6 @@
 package org.vladimir.infotecs.keyvaluedb.service;
 
+import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithTtl;
 
 import java.util.Map;
@@ -21,7 +22,7 @@ public interface KeyValueDbService {
      * @param value the value to be associated with the key
      * @param ttl the time-to-live in seconds; if {@code null} or {@code 0}, the value will not expire
      */
-    void setValueByKey(String key, String value, Long ttl);
+    void setValueByKey(String key, String value, long ttl);
 
     /**
      * Retrieves the value associated with the specified key.
@@ -47,7 +48,7 @@ public interface KeyValueDbService {
      *
      * @return a {@link Map} containing all key-value pairs, where the keys are the keys and the values are the associated values
      */
-    Map<String, String> getAllValues();
+    Map<String, ValueWithExpirationTime> getDump();
 
     /**
      * Loads all key-value pairs into the database from the provided map.
@@ -57,7 +58,7 @@ public interface KeyValueDbService {
      *
      * @param map a {@link Map} containing key-value pairs to be loaded into the database, where the values are wrapped in {@link ValueWithTtl}
      */
-    void loadAllValuesByKey(Map<String, ValueWithTtl> map);
+    void restoreFromDump(Map<String, ValueWithExpirationTime> map);
 
     /**
      * Removes all key-value pairs where the TTL has expired.

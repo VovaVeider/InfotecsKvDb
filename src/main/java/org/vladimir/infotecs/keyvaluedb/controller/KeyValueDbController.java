@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jdk.jfr.Description;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.vladimir.infotecs.keyvaluedb.dto.DeleteValueByKeyResponse;
@@ -15,9 +16,11 @@ import org.vladimir.infotecs.keyvaluedb.dto.GetValueByKeyResponse;
 import org.vladimir.infotecs.keyvaluedb.dto.LoadDumpRequest;
 import org.vladimir.infotecs.keyvaluedb.dto.SetValueByKeyRequest;
 import org.vladimir.infotecs.keyvaluedb.exception.KeyNotFound;
+import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 
 import java.util.Map;
 @Tag(name = "Key value storage")
+@Description("Simple KV db. Time format is unix time ")
 @RequestMapping("/api")
 public interface KeyValueDbController {
 
@@ -31,7 +34,7 @@ public interface KeyValueDbController {
     @GetMapping("keys/{key}")
     ResponseEntity<GetValueByKeyResponse> getValueByKey(@PathVariable String key) throws KeyNotFound;
 
-    @Operation(summary = "Set value by key", description = "Sets the value for the specified key")
+    @Operation(summary = "Set value by key", description = "Sets the value for the specified key. Ttl must be positive or zero (use default server ttl)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully set value")
     })
@@ -58,14 +61,14 @@ public interface KeyValueDbController {
                     content = @Content(schema = @Schema(implementation = Map.class)))
     })
     @GetMapping("dump")
-    ResponseEntity<Map<String, String>> getDump();
+    ResponseEntity<Map<String, ValueWithExpirationTime>> getDump();
 
     @Operation(summary = "Load dump", description = "Loads key-value pairs from the provided dump")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully loaded dump")
     })
     @PostMapping("dump")
-    ResponseEntity<Void> loadDump(@Valid @RequestBody(description = "Request body containing the dump",
+    ResponseEntity<Void> restoreFromDump(@Valid @RequestBody(description = "Request body containing the dump",
             required = true,
             content = @Content(schema = @Schema(implementation = LoadDumpRequest.class)))
                                   LoadDumpRequest requestBody);

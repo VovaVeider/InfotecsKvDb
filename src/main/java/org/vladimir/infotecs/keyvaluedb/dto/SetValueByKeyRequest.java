@@ -1,14 +1,14 @@
 package org.vladimir.infotecs.keyvaluedb.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
-import org.vladimir.infotecs.keyvaluedb.validation.NullOrPositive;
 
 @Data
 public class SetValueByKeyRequest {
     @NotNull(message = "value must not be blank")
     private String value;
 
-    @NullOrPositive(message = "ttl must be null or a positive number")
-    private Long ttl;
+    @PositiveOrZero(message = "ttl must be zero(use default server ttl value) or positive integer(long)")
+    private long ttl;
 }
