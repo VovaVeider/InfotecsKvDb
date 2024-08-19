@@ -1,6 +1,6 @@
 package org.vladimir.infotecs.keyvaluedb.repository;
 
-import org.springframework.stereotype.Repository;
+
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import java.util.Optional;
  * This class is NOT THREAD SAFE.
  * </p>
  */
-@Repository
+
 public class HashMapKeyValueRepository implements KeyValueRepository {
     private final Map<String, ValueWithExpirationTime> storage;
 

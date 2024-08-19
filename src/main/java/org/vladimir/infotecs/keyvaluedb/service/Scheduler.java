@@ -8,30 +8,30 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;;
 
 @Component
 @ConditionalOnProperty(name = "scheduler.enable", havingValue = "true")
 @EnableScheduling
 public class Scheduler {
 
-    private final KeyValueDbService keyValueDbService;
-    private Logger logger;
+    private final KeyValueService keyValueService;
+    private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
+
 
     @Autowired
-    public Scheduler(KeyValueDbService keyValueDbService) {
-        this.keyValueDbService = keyValueDbService;
+    public Scheduler(KeyValueService keyValueService) {
+        this.keyValueService = keyValueService;
     }
 
     @Scheduled(fixedDelayString = "${scheduler.fixedDelay}")
     public void deleteOutdatedKVPairs()  {
         LocalDateTime startTime = LocalDateTime.now(); // Начало измерения времени
 
-        if (logger != null) {
-            logger.info("Removing outdated KV pairs is started. Time " + startTime);
-        }
+        logger.info("Removing outdated KV pairs is started.");
 
-        keyValueDbService.deleteAllOutdatedPairs();
+        keyValueService.deleteAllOutdatedPairs();
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
@@ -39,15 +39,8 @@ public class Scheduler {
         long minutes = duration.toMinutes();
         long seconds = duration.getSeconds();
 
-        if (logger != null) {
-            logger.info(String.format("Removing outdated KV pairs is finished. Time %d hours %d minutes %d seconds", hours, minutes, seconds));
-
-        }
+        logger.info(String.format("Removing outdated KV pairs is finished. Time is spent: %d hours %d minutes %d seconds", hours, minutes, seconds));
     }
 
-    @Autowired
-    public void setLogger(Logger logger) {
-        this.logger = logger;
-    }
 }
 

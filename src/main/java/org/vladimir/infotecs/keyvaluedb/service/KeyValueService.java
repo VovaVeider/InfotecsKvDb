@@ -13,7 +13,7 @@ import java.util.Optional;
  * The values can have an associated time-to-live (TTL), after which they are considered expired and should be removed.
  * </p>
  */
-public interface KeyValueDbService {
+public interface KeyValueService {
 
     /**
      * Sets the value associated with the specified key, with an optional time-to-live (TTL).

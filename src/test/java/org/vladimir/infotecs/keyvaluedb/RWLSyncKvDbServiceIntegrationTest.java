@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 import org.vladimir.infotecs.keyvaluedb.repository.HashMapKeyValueRepository;
 import org.vladimir.infotecs.keyvaluedb.repository.KeyValueRepository;
-import org.vladimir.infotecs.keyvaluedb.service.RWLSyncKvDbService;
+import org.vladimir.infotecs.keyvaluedb.service.RWLSyncKvService;
 
 import java.util.Map;
 import java.util.Optional;
@@ -16,14 +16,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RWLSyncKvDbServiceIntegrationTest {
 
     private KeyValueRepository repository;
-    private RWLSyncKvDbService service;
+    private RWLSyncKvService service;
 
     private static final int DEFAULT_TTL = 120;
 
     @BeforeEach
     void setUp() {
         repository = new HashMapKeyValueRepository();
-        service = new RWLSyncKvDbService(repository, DEFAULT_TTL);
+        service = new RWLSyncKvService(repository, DEFAULT_TTL);
     }
 
     @Test

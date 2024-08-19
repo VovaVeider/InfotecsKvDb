@@ -13,7 +13,7 @@ import org.vladimir.infotecs.keyvaluedb.dto.LoadDumpRequest;
 import org.vladimir.infotecs.keyvaluedb.dto.SetValueByKeyRequest;
 import org.vladimir.infotecs.keyvaluedb.exception.KeyNotFound;
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
-import org.vladimir.infotecs.keyvaluedb.service.KeyValueDbService;
+import org.vladimir.infotecs.keyvaluedb.service.KeyValueService;
 
 import java.util.Map;
 
@@ -21,15 +21,15 @@ import java.util.Map;
 
 public class KeyValueDbControllerImpl implements KeyValueDbController {
 
-    private final KeyValueDbService keyValueDbService;
+    private final KeyValueService keyValueService;
 
-    KeyValueDbControllerImpl(@Autowired KeyValueDbService keyValueDbService) {
-        this.keyValueDbService = keyValueDbService;
+    KeyValueDbControllerImpl(@Autowired KeyValueService keyValueService) {
+        this.keyValueService = keyValueService;
     }
 
 
     public ResponseEntity<GetValueByKeyResponse> getValueByKey(@PathVariable String key) {
-        String value = keyValueDbService.getValueByKey(key).orElseThrow(KeyNotFound::new);
+        String value = keyValueService.getValueByKey(key).orElseThrow(KeyNotFound::new);
         return ResponseEntity.ok(new GetValueByKeyResponse(value));
     }
 
@@ -37,7 +37,7 @@ public class KeyValueDbControllerImpl implements KeyValueDbController {
     public ResponseEntity<Void> setValueByKey(@PathVariable String key, @Valid @RequestBody SetValueByKeyRequest setValueByKeyRequest) {
         Long ttl = setValueByKeyRequest.getTtl();
         String value = setValueByKeyRequest.getValue();
-        keyValueDbService.setValueByKey(key, value, ttl);
+        keyValueService.setValueByKey(key, value, ttl);
         return ResponseEntity.ok().build();
     }
 
@@ -45,19 +45,19 @@ public class KeyValueDbControllerImpl implements KeyValueDbController {
     public ResponseEntity<DeleteValueByKeyResponse> deleteValueByKey(@PathVariable String key) {
         DeleteValueByKeyResponse response = new DeleteValueByKeyResponse();
         response.setValue(
-                keyValueDbService
+                keyValueService
                         .deleteValueByKey(key)
                         .orElseThrow(KeyNotFound::new));
         return ResponseEntity.ok(response);
     }
 
     public ResponseEntity<Map<String, ValueWithExpirationTime>> getDump() {
-        return ResponseEntity.ok(keyValueDbService.getDump());
+        return ResponseEntity.ok(keyValueService.getDump());
     }
 
 
     public ResponseEntity<Void> restoreFromDump(@Valid @RequestBody LoadDumpRequest requestBody) {
-        keyValueDbService.restoreFromDump(requestBody.getDump());
+        keyValueService.restoreFromDump(requestBody.getDump());
         return ResponseEntity.ok().build();
     }
 

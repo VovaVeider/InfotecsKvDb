@@ -3,7 +3,6 @@ package org.vladimir.infotecs.keyvaluedb.service;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.vladimir.infotecs.keyvaluedb.exception.IncorrectTtlValue;
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 import org.vladimir.infotecs.keyvaluedb.repository.KeyValueRepository;
@@ -15,15 +14,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 /**
- * {@link KeyValueDbService} implementation
+ * {@link KeyValueService} implementation
  * <p>
  * This class uses read-write locks to manage concurrent access to the underlying {@link KeyValueRepository}.
  * It ensures that multiple threads can read the key-value store concurrently, but only one thread can
  * write to the store at a time, while preventing any read or write operations from occurring during a write.
  * </p>
  */
-@Service
-public class RWLSyncKvDbService implements KeyValueDbService {
+
+public class RWLSyncKvService implements KeyValueService {
 
     private final KeyValueRepository repository;
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
@@ -32,7 +31,7 @@ public class RWLSyncKvDbService implements KeyValueDbService {
     private final long defaultTTL;
 
     @Autowired
-    public RWLSyncKvDbService(KeyValueRepository keyValueRepository, @Value("${defaultTTL:120}") long defaultTTL) {
+    public RWLSyncKvService(KeyValueRepository keyValueRepository, @Value("${defaultTTL:120}") long defaultTTL) {
         this.repository = keyValueRepository;
         this.defaultTTL = defaultTTL;
     }

@@ -19,6 +19,7 @@ import org.vladimir.infotecs.keyvaluedb.exception.KeyNotFound;
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 
 import java.util.Map;
+
 @Tag(name = "Key value storage")
 @Description("Simple KV db. Time format is unix time ")
 @RequestMapping("/api")
@@ -55,7 +56,7 @@ public interface KeyValueDbController {
     @DeleteMapping("keys/{key}")
     ResponseEntity<DeleteValueByKeyResponse> deleteValueByKey(@PathVariable String key) throws KeyNotFound;
 
-    @Operation(summary = "Get dump", description = "Retrieves all key-value pairs")
+    @Operation(summary = "Get dump", description = "Retrieves storage dump")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved dump",
                     content = @Content(schema = @Schema(implementation = Map.class)))
@@ -63,14 +64,15 @@ public interface KeyValueDbController {
     @GetMapping("dump")
     ResponseEntity<Map<String, ValueWithExpirationTime>> getDump();
 
-    @Operation(summary = "Load dump", description = "Loads key-value pairs from the provided dump")
+    @Operation(summary = "Load dump", description = "Restore storage state  from the provided dump")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully loaded dump")
     })
     @PostMapping("dump")
-    ResponseEntity<Void> restoreFromDump(@Valid @RequestBody(description = "Request body containing the dump",
+    ResponseEntity<Void> restoreFromDump(@Valid @RequestBody(description = "Request body containing the dump, " +
+            "expiration time in unix time (seconds from epoch utc)",
             required = true,
             content = @Content(schema = @Schema(implementation = LoadDumpRequest.class)))
-                                  LoadDumpRequest requestBody);
+                                         LoadDumpRequest requestBody);
 }
 

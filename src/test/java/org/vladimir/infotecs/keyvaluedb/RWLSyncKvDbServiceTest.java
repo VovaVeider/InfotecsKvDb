@@ -7,7 +7,7 @@ import org.mockito.exceptions.base.MockitoAssertionError;
 import org.vladimir.infotecs.keyvaluedb.exception.IncorrectTtlValue;
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
 import org.vladimir.infotecs.keyvaluedb.repository.KeyValueRepository;
-import org.vladimir.infotecs.keyvaluedb.service.RWLSyncKvDbService;
+import org.vladimir.infotecs.keyvaluedb.service.RWLSyncKvService;
 
 import java.util.Map;
 import java.util.Optional;
@@ -19,13 +19,13 @@ import static org.mockito.Mockito.*;
 public class RWLSyncKvDbServiceTest {
 
     private KeyValueRepository repository;
-    private RWLSyncKvDbService service;
+    private RWLSyncKvService service;
     private static final int DEFAULT_TTL = 120;
 
     @BeforeEach
     void setUp() {
         repository = mock(KeyValueRepository.class);
-        service = new RWLSyncKvDbService(repository, DEFAULT_TTL);
+        service = new RWLSyncKvService(repository, DEFAULT_TTL);
     }
 
     @Test
