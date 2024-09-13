@@ -1,5 +1,7 @@
 package org.vladimir.infotecs.keyvaluedb;
 
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.vladimir.infotecs.keyvaluedb.model.ValueWithExpirationTime;
@@ -21,6 +23,7 @@ public class HashMapKeyValueRepositoryTest {
     @BeforeEach
     void setUp() {
         repository = new HashMapKeyValueRepository();
+
     }
 
     private long toUnixTime(LocalDateTime dateTime) {
@@ -70,7 +73,7 @@ public class HashMapKeyValueRepositoryTest {
         assertTrue(repository.getIfNotOutdated(key, toUnixTime(now)).isPresent());
 
         repository.put(key, value, toUnixTime(now.plusDays(1)));
-        assertFalse(repository.getIfNotOutdated(key,toUnixTime(now.plusDays(2))).isPresent());
+        assertFalse(repository.getIfNotOutdated(key, toUnixTime(now.plusDays(2))).isPresent());
 
     }
 
